@@ -12,16 +12,16 @@ CREATE SCHEMA IF NOT EXISTS pl2t;
 \echo 'creando la tabla temporal canciones'
 CREATE TABLE pl2t.canciones (
     id_del_disco text,
-    Titulo_de_la_cancion text,
+    titulo_de_la_cancion text,
     duracion text);
 
 \echo 'creando la tabla temporal discos'
 CREATE TABLE pl2t.discos (
     id_disco TEXT,
-    Nombre_del_disco text,
+    nombre_del_disco text,
     fecha_de_lanzamiento text,
     id_grupo text,
-    Nombre_del_grupo text,
+    nombre_del_grupo text,
     url_del_grupo text,
     generos text,
     url_portada text);
@@ -89,11 +89,46 @@ SET search_path='nombre del esquema o esquemas utilizados';
 
 --\copy pl2t. from '~/clase/BDPL2/usuarios.csv' WITH (FORMAT csv, HEADER, DELIMITER ';', NULL 'NULL', ENCODING'UTF-8');
 
-\echo insertando datos en el esquema final
+\echo 'insertando datos en el esquema final'
+
+CREATE SCHEMA IF NOT EXISTS pl2final;
+
+CREATE TABLE pl2final.canciones (
+    id_del_disco INTEGER NOT NULL,
+    titulo_de_la_cancion TEXT NOT NULL,
+    duracion TIME NOT NULL;
+    CONSTRAINT canciones_pk PRIMARY KEY (titulo_de_la_cancion),
+    CONSTRAINT canciones_fk FOREIGN KEY (id_del_disco) REFERENCES pl2final.discos (id_disco)
+);
+
+CREATE TABLE pl2final.discos (
+    id_disco INTEGER NOT NULL,
+    nombre_del_disco TEXT NOT NULL,
+    fecha_de_lanzamiento INTEGER NOT NULL,
+    id_grupo INTEGER NOT NULL,
+    nombre_del_grupo TEXT NOT NULL,
+    url_del_grupo TEXT NOT NULL,
+    url_portada TEXT NOT NULL,
+    CONSTRAINT fecha_valida CHECK (fecha_de_lanzamiento > 0),
+    CONSTRAINT discos_pk PRIMARY KEY (fecha_de_lanzamiento, nombre_del_disco)
+);
+
+CREATE TABLE pl2final.ediciones (
+    id_del_disco INTEGER NOT NULL,
+    anno_de_la_edicion INTEGER NOT NULL,
+    pais_de_la_edicion TEXT NOT NULL,
+    formato TEXT NOT NULL,
+    CONSTRAINT anno_valido CHECK (anno_de_la_edicion > 0),
+    CONSTRAINT pais_valido CHECK (pais != 'None' AND pais_de_la_edicion != ''),
+    CONSTRAINT ediciones_pk PRIMARY KEY (formato, anno_de_la_edicion, pais_de_la_edicion), 
+    CONSTRAINT ediciones_fk FOREIGN KEY (id_del_disco) REFERENCES pl2final.discos(id_disco)
+);
+
+
 
 \echo Consulta 1: texto de la consulta
 
 \echo Consulta n:
 
 END
---ROLLBACK;                       -- importante! permite correr el script multiples veces...p
+--ROLLBACK;                       -- importante! permite correr el script multiples veces...
