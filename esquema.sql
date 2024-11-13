@@ -1,9 +1,6 @@
-\pset pager off
+\pset pager on
 
 SET client_encoding = 'UTF8';
-psql -U <postgres>
-CREATE DATABASE PL2;
-\c PL2
 
 BEGIN;
 \echo 'Creando el esquema para la BBDD de discos'
@@ -20,7 +17,7 @@ CREATE TABLE pl2t.canciones (
 
 \echo 'creando la tabla temporal discos'
 CREATE TABLE pl2t.discos (
-    id_disco text,
+    id_disco TEXT,
     Nombre_del_disco text,
     fecha_de_lanzamiento text,
     id_grupo text,
@@ -31,16 +28,31 @@ CREATE TABLE pl2t.discos (
 
 \echo 'creando la tabla temporal ediciones'
 CREATE TABLE pl2t.ediciones (
-    id_del_disco text,
-    anno_de_la_edicion text,
-    pais_de_la_edicion text,
-    formato text);
+    id_del_disco TEXT,
+    anno_de_la_edicion TEXT,
+    pais_de_la_edicion TEXT,
+    formato TEXT
+);
+
+\echo 'creando la tabla temporal generos'
+CREATE TABLE pl2t.generos (
+    anno_publicacion_genero TEXT,
+    titulodisco TEXT,
+    genero TEXT
+);
+
+\echo 'creando la tabla temporal grupo'
+CREATE TABLE pl2t.grupo (
+    nombre_grupo TEXT,
+    URL TEXT
+);
 
 \echo 'creando la tabla temporal desea'
 CREATE TABLE pl2t.desea (
     nombre_usuario TEXT,
     titulo_disco TEXT,
-    anno_lanzamiento_disco TEXT);
+    anno_lanzamiento_disco TEXT
+);
 
 \echo 'creando la tabla temporal tiene'
 CREATE TABLE pl2t.tiene (
@@ -49,11 +61,12 @@ CREATE TABLE pl2t.tiene (
     anno_edicion TEXT,
     pais_edicion TEXT,
     formato TEXT,
-    estado TEXT);
+    estado TEXT
+);
 
 CREATE TABLE pl2t.usuarios (
-	nombre_completo TEXT, 
-	nombre_usuario TEXT PRIMARY KEY,
+	nombre_completo TEXT,
+	nombre_usuario TEXT,
 	email TEXT,
 	password TEXT
 );
@@ -64,13 +77,11 @@ SET search_path='nombre del esquema o esquemas utilizados';
 
 \echo 'Cargando datos'
 
-\copy pl2t.desea
-    from './datos/usuario_desea_disco.csv'
-    WITH (FORMAT csv, HEADER, DELIMITER ';', NULL 'NULL', ENCODING 'UTF-8');
+\copy pl2t.desea FROM '~/clase/BDPL2/usuario_desea_disco.csv' WITH (FORMAT csv, HEADER, DELIMITER ';', NULL 'NULL', ENCODING 'UTF-8');
 
-\copy pl2t.usuarios
-    from './usuarios.csv'
-    WITH (FORMAT csv, HEADER, DELIMITER ';', NULL 'NULL', ENCODING 'UTF-8');
+\copy pl2t.usuarios from '~/clase/BDPL2/usuarios.csv' WITH (FORMAT csv, HEADER, DELIMITER ';', NULL 'NULL', ENCODING'UTF-8');
+
+\copy pl2t. from '~/clase/BDPL2/usuarios.csv' WITH (FORMAT csv, HEADER, DELIMITER ';', NULL 'NULL', ENCODING'UTF-8');
 
 \echo insertando datos en el esquema final
 
@@ -78,5 +89,5 @@ SET search_path='nombre del esquema o esquemas utilizados';
 
 \echo Consulta n:
 
-
-ROLLBACK;                       -- importante! permite correr el script multiples veces...p
+END
+--ROLLBACK;                       -- importante! permite correr el script multiples veces...p
