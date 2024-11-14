@@ -156,7 +156,16 @@ CREATE TABLE IF NO EXISTS pl2final.tiene (
 
 );
 
-
+/echo Formateando duracion
+SELECT *
+FROM pl2final.canciones
+    UPDATE pl2final.canciones
+    CASE WHEN duracion IS NOT NULL AND LENGH(duracion) = 7 THEN
+	SET duracion = '0' || duracion
+    CASE WHEN duracion IS NOT NULL AND LENGH(duracion) = 5 THEN
+	SET duracion = '00:' || duracion
+    CASE WHEN duracion IS NOT NULL AND LENGH(duracion) = 4 THEN
+	SET duracion = '00:0' || duracion
 
 \echo Consulta 1: texto de la consulta
 
