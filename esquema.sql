@@ -71,10 +71,6 @@ CREATE TABLE pl2t.usuarios (
 	password TEXT
 );
 
-
-
-SET search_path='nombre del esquema o esquemas utilizados';
-
 \echo 'Cargando datos'
 
 \copy pl2t.canciones from '~/clase/BDPL2/canciones.csv' WITH (FORMAT csv, HEADER, DELIMITER ';', NULL 'NULL', ENCODING'UTF-8');
@@ -93,79 +89,70 @@ SET search_path='nombre del esquema o esquemas utilizados';
 
 CREATE SCHEMA IF NOT EXISTS pl2final;
 
-CREATE TABLE IF NO EXISTS pl2final.usuarios (
-    nombre_completo TEXT NOT NULL,
+CREATE TABLE IF NOT EXISTS pl2final.usuarios (
+	nombre_completo TEXT NOT NULL,
 	nombre_usuario TEXT UNIQUE NOT NULL,
 	email TEXT NOT NULL,
 	password TEXT NOT NULL,
     CONSTRAINT usuario_pk PRIMARY KEY (nombre_usuario)
 );
 
-CREATE TABLE IF NO EXISTS pl2final.canciones (
-    id_del_disco INTEGER NOT NULL,
-    titulo_de_la_cancion TEXT NOT NULL,
-    duracion TIME NOT NULL; --falta lo del formato hh:mm:ss
-    CONSTRAINT canciones_pk PRIMARY KEY (titulo_de_la_cancion),
-    CONSTRAINT canciones_fk FOREIGN KEY (id_del_disco) REFERENCES pl2final.discos (id_disco)
+CREATE TABLE IF NOT EXISTS pl2final.grupo (
+
 );
 
-CREATE TABLE IF NO EXISTS pl2final.discos (
-    id_disco INTEGER NOT NULL,
-    nombre_del_disco TEXT NOT NULL,
-    fecha_de_lanzamiento INTEGER NOT NULL,
+CREATE TABLE IF NOT EXISTS pl2final.discos (
+    id_disco INTEGER NOT NULL UNIQUE,
+    nombre_del_disco TEXT NOT NULL UNIQUE,
+    fecha_de_lanzamiento INTEGER NOT NULL UNIQUE,
     id_grupo INTEGER NOT NULL,
     nombre_del_grupo TEXT NOT NULL,
     url_del_grupo TEXT NOT NULL,
     url_portada TEXT NOT NULL,
     CONSTRAINT fecha_valida CHECK (fecha_de_lanzamiento > 0),
-    CONSTRAINT discos_pk PRIMARY KEY (fecha_de_lanzamiento, nombre_del_disco),
-    CONSTRAINT canciones_fk FOREIGN KEY (id_grupo) REFERENCES (pl2final.grupo)
+    CONSTRAINT discos_pk PRIMARY KEY (fecha_de_lanzamiento, nombre_del_disco)
+    --CONSTRAINT canciones_fk FOREIGN KEY (id_grupo) REFERENCES (pl2final.grupo)
 );
 
-CREATE TABLE IF NO EXISTS pl2final.ediciones (
+CREATE TABLE IF NOT EXISTS pl2final.canciones (
+    id_del_disco INTEGER NOT NULL,
+    titulo_de_la_cancion TEXT NOT NULL,
+    duracion TIME NOT NULL, --falta lo del formato hh:mm:ss
+    CONSTRAINT canciones_pk PRIMARY KEY (titulo_de_la_cancion),
+    CONSTRAINT canciones_fk FOREIGN KEY (id_del_disco) REFERENCES pl2final.discos(id_disco)
+);
+
+CREATE TABLE IF NOT EXISTS pl2final.ediciones (
     id_del_disco INTEGER NOT NULL,
     anno_de_la_edicion INTEGER NOT NULL,
     pais_de_la_edicion TEXT NOT NULL,
     formato TEXT NOT NULL,
     CONSTRAINT anno_valido CHECK (anno_de_la_edicion > 0),
-    CONSTRAINT pais_valido CHECK (pais != 'None' AND pais_de_la_edicion != ''),
+    CONSTRAINT pais_valido CHECK (pais_de_la_edicion != 'None' AND pais_de_la_edicion != ''),
     CONSTRAINT ediciones_pk PRIMARY KEY (formato, anno_de_la_edicion, pais_de_la_edicion), 
     CONSTRAINT ediciones_fk FOREIGN KEY (id_del_disco) REFERENCES pl2final.discos(id_disco)
 );
 
-CREATE TABLE IF NO EXISTS pl2final.generos (
+CREATE TABLE IF NOT EXISTS pl2final.generos (
 
 );
 
-CREATE TABLE IF NO EXISTS pl2final.grupo (
 
-);
-
-CREATE TABLE IF NO EXISTS pl2final.desea (
+CREATE TABLE IF NOT EXISTS pl2final.desea (
     nombre_usuario TEXT NOT NULL ,
     titulo_disco TEXT NOT NULL,
     anno_lanzamiento_disco INTEGER NOT NULL,
     CONSTRAINT anno_valido CHECK (anno_lanzamiento_disco > 0),
-    CONSTRAINT desea_fk FOREIGN KEY (nombre_usuario) REFERENCES pl2final.usuarios(nombre_usuarios),
-    CONSTRAINT desea_fk FOREIGN KEY (titulo_disco) REFERENCES pl2final.disco(nombre_del_disco),
-    CONSTRAINT desea_fk FOREIGN KEY (anno_lanzamiento_disco) REFERENCES pl2final.disco(fecha_de_lanzamiento)
+    CONSTRAINT desea_fk1 FOREIGN KEY (nombre_usuario) REFERENCES pl2final.usuarios(nombre_usuario),
+    CONSTRAINT desea_fk2 FOREIGN KEY (titulo_disco) REFERENCES pl2final.discos(nombre_del_disco),
+    CONSTRAINT desea_fk3 FOREIGN KEY (anno_lanzamiento_disco) REFERENCES pl2final.discos(fecha_de_lanzamiento)
+);
+
+CREATE TABLE IF NOT EXISTS pl2final.tiene (
 
 );
 
-CREATE TABLE IF NO EXISTS pl2final.tiene (
-
-);
-
-/echo Formateando duracion
-SELECT *
-FROM pl2final.canciones
-    UPDATE pl2final.canciones
-    CASE WHEN duracion IS NOT NULL AND LENGH(duracion) = 7 THEN
-	SET duracion = '0' || duracion
-    CASE WHEN duracion IS NOT NULL AND LENGH(duracion) = 5 THEN
-	SET duracion = '00:' || duracion
-    CASE WHEN duracion IS NOT NULL AND LENGH(duracion) = 4 THEN
-	SET duracion = '00:0' || duracion
+\echo Formateando duracion
 
 \echo Consulta 1: texto de la consulta
 
