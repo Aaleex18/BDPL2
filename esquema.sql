@@ -73,15 +73,15 @@ CREATE TABLE pl2t.usuarios (
 
 \echo 'Cargando datos'
 
-\copy pl2t.canciones from '~/clase/BDPL2/canciones.csv' WITH (FORMAT csv, HEADER, DELIMITER ';', NULL 'NULL', ENCODING'UTF-8');
+\copy pl2t.canciones from './canciones.csv' WITH (FORMAT csv, HEADER, DELIMITER ';', NULL 'NULL', ENCODING'UTF-8');
 
-\copy pl2t.discos from '~/clase/BDPL2/discos.csv' WITH (FORMAT csv, HEADER, DELIMITER ';', NULL 'NULL', ENCODING'UTF-8');
+\copy pl2t.discos from './discos.csv' WITH (FORMAT csv, HEADER, DELIMITER ';', NULL 'NULL', ENCODING'UTF-8');
 
-\copy pl2t.ediciones from '~/clase/BDPL2/ediciones.csv' WITH (FORMAT csv, HEADER, DELIMITER ';', NULL 'NULL', ENCODING'UTF-8');
+\copy pl2t.ediciones from './ediciones.csv' WITH (FORMAT csv, HEADER, DELIMITER ';', NULL 'NULL', ENCODING'UTF-8');
 
-\copy pl2t.desea FROM '~/clase/BDPL2/usuario_desea_disco.csv' WITH (FORMAT csv, HEADER, DELIMITER ';', NULL 'NULL', ENCODING 'UTF-8');
+\copy pl2t.desea FROM './usuario_desea_disco.csv' WITH (FORMAT csv, HEADER, DELIMITER ';', NULL 'NULL', ENCODING 'UTF-8');
 
-\copy pl2t.usuarios from '~/clase/BDPL2/usuarios.csv' WITH (FORMAT csv, HEADER, DELIMITER ';', NULL 'NULL', ENCODING'UTF-8');
+\copy pl2t.usuarios from './usuarios.csv' WITH (FORMAT csv, HEADER, DELIMITER ';', NULL 'NULL', ENCODING'UTF-8');
 
 --\copy pl2t. from '~/clase/BDPL2/usuarios.csv' WITH (FORMAT csv, HEADER, DELIMITER ';', NULL 'NULL', ENCODING'UTF-8');
 
