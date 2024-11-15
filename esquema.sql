@@ -43,8 +43,8 @@ CREATE TABLE pl2t.generos (
 
 \echo 'creando la tabla temporal grupo'
 CREATE TABLE pl2t.grupo (
-    nombre_grupo TEXT,
-    URL TEXT
+    id_grupo TEXT,
+    URL_grupo TEXT
 );
 
 \echo 'creando la tabla temporal desea'
@@ -98,8 +98,15 @@ CREATE TABLE IF NOT EXISTS pl2final.usuarios (
 );
 
 CREATE TABLE IF NOT EXISTS pl2final.grupo (
-
+    id_grupo INTEGER NOT NULL,
+    URL_grupo TEXT NOT NULL,
+    CONSTRAINT grupo_pk PRIMARY KEY (id_grupo)
 );
+
+--LOS ATRIBUTOS DE GRUPO SERAN UNA SELECCION DE LOS ATRIBUTOS ID_DEL_GRUPO Y url_DEL_GRUPO DEL CSV DE DISCOS
+--SELECT ID_DEL_GRUPO, URL_DEL_GRUPO
+--FROM PL2FINAL.DISCOS
+--WHERE LO QUE SEA
 
 CREATE TABLE IF NOT EXISTS pl2final.discos (
     id_disco INTEGER NOT NULL UNIQUE,
@@ -111,7 +118,7 @@ CREATE TABLE IF NOT EXISTS pl2final.discos (
     url_portada TEXT NOT NULL,
     CONSTRAINT fecha_valida CHECK (fecha_de_lanzamiento > 0),
     CONSTRAINT discos_pk PRIMARY KEY (fecha_de_lanzamiento, nombre_del_disco)
-    --CONSTRAINT canciones_fk FOREIGN KEY (id_grupo) REFERENCES (pl2final.grupo)
+    CONSTRAINT canciones_fk FOREIGN KEY (id_grupo, url_del_grupo) REFERENCES pl2final.grupo(id_grupo, URL_grupo)
 );
 
 CREATE TABLE IF NOT EXISTS pl2final.canciones (
@@ -134,8 +141,24 @@ CREATE TABLE IF NOT EXISTS pl2final.ediciones (
 );
 
 CREATE TABLE IF NOT EXISTS pl2final.generos (
-
+    anno_publicacion_genero INTEGER NOT NULL,
+    titulodisco TEXT NOT NULL,
+    genero TEXT NOT NULL,
+    CONSTRAINT generos_fk FOREIGN KEY (anno_publicacion_genero, titulodisco) REFERENCES pl2final.discos(anno_de_lanzamiento, nombre_del_disco),
+    CONSTRAINT generos_pk PRIMARY KEY (genero)
 );
+
+--select fecha_de_lanzamiento, nombre_del_disco
+--from discos
+--where lo que sea 
+
+
+--para atributos multivaluados
+--regexp_split_to_table ( string text, pattern text [, flags text ] ) → setof text
+--Splits string using a POSIX regular expression as the delimiter, producing a set of results; see Section 9.7.3.
+--regexp_split_to_table('hello world', '\s+') →
+-- hello
+-- world
 
 
 CREATE TABLE IF NOT EXISTS pl2final.desea (
@@ -149,7 +172,16 @@ CREATE TABLE IF NOT EXISTS pl2final.desea (
 );
 
 CREATE TABLE IF NOT EXISTS pl2final.tiene (
-
+    nombre_usuario TEXT NOT NULL,
+    anno_lanzamiento INT NOT NULL,
+    anno_edicion INT NOT NULL ,
+    pais_edicion TEXT NOT NULL,
+    formato TEXT NOT NULL,
+    estado TEXT NOT NULL,
+    CONSTRAINT annos_validos CHECK (anno_lanzamiento > 0 AND anno_edicion > 0),
+    CONSTRAINT tiene_fk1 FOREIGN KEY (nombre_usuario) REFERENCES pl2final.usuarios(nombre_usuario),
+    CONSTRAINT tiene_fk2 FOREIGN KEY (anno_edicion, pais_edicion, formato) REFERENCES pl2final.ediciones(anno_de_la_edicion, pais_de_la_edicion, formato),
+    CONSTRAINT tiene_fk3 FOREIGN KEY (anno_lanzamiento) REFERENCES pl2final.discos(fecha_de_lanzamiento)
 );
 
 \echo Formateando duracion
