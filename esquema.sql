@@ -1,5 +1,5 @@
 \pset pager on
-
+\c finaldestinadoDB
 SET client_encoding = 'UTF8';
 
 BEGIN;
@@ -98,7 +98,7 @@ CREATE TABLE IF NOT EXISTS pl2final.usuarios (
 );
 
 CREATE TABLE IF NOT EXISTS pl2final.grupo (
-    id_grupo INTEGER NOT NULL,
+    id_grupo INTEGER UNIQUE NOT NULL,
     URL_grupo TEXT NOT NULL,
     CONSTRAINT grupo_pk PRIMARY KEY (id_grupo)
 );
@@ -116,9 +116,12 @@ CREATE TABLE IF NOT EXISTS pl2final.discos (
     nombre_del_grupo TEXT NOT NULL,
     url_del_grupo TEXT NOT NULL,
     url_portada TEXT NOT NULL,
-    CONSTRAINT fecha_valida CHECK (fecha_de_lanzamiento > 0),
-    CONSTRAINT discos_pk PRIMARY KEY (fecha_de_lanzamiento, nombre_del_disco)
-    CONSTRAINT canciones_fk FOREIGN KEY (id_grupo, url_del_grupo) REFERENCES pl2final.grupo(id_grupo, URL_grupo)
+    CHECK (fecha_de_lanzamiento > 0),
+    CONSTRAINT discos_pk PRIMARY KEY (fecha_de_lanzamiento, nombre_del_disco),
+    CONSTRAINT can_fk_idgrupo FOREIGN KEY (id_grupo) REFERENCES pl2final.grupo(id_grupo) 
+	MATCH FULL ON DELETE CASCADE ON UPDATE CASCADE
+    --CONSTRAINT can_fk_urlgrupo FOREIGN KEY (url_del_grupo) REFERENCES pl2final.grupo(URL_grupo)
+--	MATCH FULL ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS pl2final.canciones (
@@ -127,6 +130,7 @@ CREATE TABLE IF NOT EXISTS pl2final.canciones (
     duracion TIME NOT NULL, --falta lo del formato hh:mm:ss
     CONSTRAINT canciones_pk PRIMARY KEY (titulo_de_la_cancion),
     CONSTRAINT canciones_fk FOREIGN KEY (id_del_disco) REFERENCES pl2final.discos(id_disco)
+	ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS pl2final.ediciones (
@@ -138,13 +142,15 @@ CREATE TABLE IF NOT EXISTS pl2final.ediciones (
     CONSTRAINT pais_valido CHECK (pais_de_la_edicion != 'None' AND pais_de_la_edicion != ''),
     CONSTRAINT ediciones_pk PRIMARY KEY (formato, anno_de_la_edicion, pais_de_la_edicion), 
     CONSTRAINT ediciones_fk FOREIGN KEY (id_del_disco) REFERENCES pl2final.discos(id_disco)
+	ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS pl2final.generos (
     anno_publicacion_genero INTEGER NOT NULL,
     titulodisco TEXT NOT NULL,
     genero TEXT NOT NULL,
-    CONSTRAINT generos_fk FOREIGN KEY (anno_publicacion_genero, titulodisco) REFERENCES pl2final.discos(anno_de_lanzamiento, nombre_del_disco),
+    CONSTRAINT generos_fk FOREIGN KEY (anno_publicacion_genero, titulodisco) REFERENCES pl2final.discos(fecha_de_lanzamiento, nombre_del_disco)
+    MATCH FULL ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT generos_pk PRIMARY KEY (genero)
 );
 
@@ -166,9 +172,12 @@ CREATE TABLE IF NOT EXISTS pl2final.desea (
     titulo_disco TEXT NOT NULL,
     anno_lanzamiento_disco INTEGER NOT NULL,
     CONSTRAINT anno_valido CHECK (anno_lanzamiento_disco > 0),
-    CONSTRAINT desea_fk1 FOREIGN KEY (nombre_usuario) REFERENCES pl2final.usuarios(nombre_usuario),
-    CONSTRAINT desea_fk2 FOREIGN KEY (titulo_disco) REFERENCES pl2final.discos(nombre_del_disco),
+    CONSTRAINT desea_fk1 FOREIGN KEY (nombre_usuario) REFERENCES pl2final.usuarios(nombre_usuario)
+	ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT desea_fk2 FOREIGN KEY (titulo_disco) REFERENCES pl2final.discos(nombre_del_disco)
+	ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT desea_fk3 FOREIGN KEY (anno_lanzamiento_disco) REFERENCES pl2final.discos(fecha_de_lanzamiento)
+	ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS pl2final.tiene (
@@ -179,13 +188,21 @@ CREATE TABLE IF NOT EXISTS pl2final.tiene (
     formato TEXT NOT NULL,
     estado TEXT NOT NULL,
     CONSTRAINT annos_validos CHECK (anno_lanzamiento > 0 AND anno_edicion > 0),
-    CONSTRAINT tiene_fk1 FOREIGN KEY (nombre_usuario) REFERENCES pl2final.usuarios(nombre_usuario),
-    CONSTRAINT tiene_fk2 FOREIGN KEY (anno_edicion, pais_edicion, formato) REFERENCES pl2final.ediciones(anno_de_la_edicion, pais_de_la_edicion, formato),
+    CONSTRAINT tiene_fk1 FOREIGN KEY (nombre_usuario) REFERENCES pl2final.usuarios(nombre_usuario)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT tiene_fk2 FOREIGN KEY (anno_edicion, pais_edicion, formato) REFERENCES pl2final.ediciones(anno_de_la_edicion, pais_de_la_edicion, formato)
+        ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT tiene_fk3 FOREIGN KEY (anno_lanzamiento) REFERENCES pl2final.discos(fecha_de_lanzamiento)
+        ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+\echo CARGANDO LAS TABLAS
+\echo Cargando la tabla de usuarios
+--INSERT INTO pl2final.usuarios
 \echo Formateando duracion
 
+\echo Atributos Multievaluados
+\echo Conversión de tipos
 \echo Consulta 1: texto de la consulta
 
 \echo Consulta n:
